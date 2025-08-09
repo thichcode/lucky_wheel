@@ -115,6 +115,10 @@ textarea {
     text-align: left;
 }
 
+#resultsTable th:first-child, #resultsTable td:first-child {
+    width: 70%;
+}
+
 #resultsTable th {
     background-color: #4CAF50;
     color: white;
