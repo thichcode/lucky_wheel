@@ -103,25 +103,25 @@ textarea {
     color: #333;
 }
 
-#resultsTable {
+#historyTable, #summaryTable {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
-#resultsTable th, #resultsTable td {
+#historyTable th, #historyTable td, #summaryTable th, #summaryTable td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
 }
 
-#resultsTable th:first-child, #resultsTable td:first-child {
-    width: 70%;
-}
-
-#resultsTable th {
+#historyTable th, #summaryTable th {
     background-color: #4CAF50;
     color: white;
+}
+
+#summaryTable th:first-child, #summaryTable td:first-child {
+    width: 70%;
 }
 
 .modal {

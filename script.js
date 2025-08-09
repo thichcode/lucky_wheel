@@ -8,7 +8,8 @@ const winnerText = document.getElementById('winnerText');
 const removeBtn = document.getElementById('removeBtn');
 const keepBtn = document.getElementById('keepBtn');
 const wheelTitleInput = document.getElementById('wheelTitleInput');
-const resultsTableBody = document.querySelector('#resultsTable tbody');
+const historyTableBody = document.querySelector('#historyTable tbody');
+const summaryTableBody = document.querySelector('#summaryTable tbody');
 
 let names = ['Prize 1', 'Prize 2', 'Prize 3', 'Prize 4', 'Prize 5', 'Prize 6'];
 let colors = ['#FFC300', '#FF5733', '#C70039', '#900C3F', '#581845', '#1B4F72'];
@@ -16,6 +17,7 @@ let rotation = 0;
 let spinSpeed = 0;
 let isSpinning = false;
 let winningSegment;
+let spinCount = 0;
 const results = {};
 
 function drawWheel() {
@@ -51,6 +53,7 @@ function drawWheel() {
 function spin() {
     if (isSpinning) return;
     isSpinning = true;
+    spinCount++;
     // Add more randomness to the spin
     spinSpeed = Math.random() * 0.4 + 0.2; // Increased range
     rotation = Math.random() * 2 * Math.PI; // Start at a random angle
@@ -92,14 +95,22 @@ function hideWinner() {
 }
 
 function updateResults(winner) {
+    // Update history
+    const newRow = historyTableBody.insertRow();
+    const spinCell = newRow.insertCell(0);
+    const winnerCell = newRow.insertCell(1);
+    spinCell.textContent = spinCount;
+    winnerCell.textContent = winner;
+
+    // Update summary
     results[winner] = (results[winner] || 0) + 1;
-    renderResults();
+    renderSummary();
 }
 
-function renderResults() {
-    resultsTableBody.innerHTML = '';
+function renderSummary() {
+    summaryTableBody.innerHTML = '';
     for (const winner in results) {
-        const newRow = resultsTableBody.insertRow();
+        const newRow = summaryTableBody.insertRow();
         const winnerCell = newRow.insertCell(0);
         const winsCell = newRow.insertCell(1);
         winnerCell.textContent = winner;
