@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Wheel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <input type="text" id="wheelTitleInput" value="Lucky Wheel">
+    <div class="wheel-container">
+        <canvas id="wheelCanvas" width="500" height="500"></canvas>
+        <button id="spinBtn"></button>
+    </div>
+    <div class="input-container">
+        <textarea id="nameInput" placeholder="Enter names, one per line"></textarea>
+        <button id="updateBtn">Update Wheel</button>
+    </div>
+
+    <div id="winnerModal" class="modal">
+        <div class="modal-content">
+            <h2 id="winnerText"></h2>
+            <button id="removeBtn">Remove Winner</button>
+            <button id="keepBtn">Keep Winner</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
