@@ -87,10 +87,23 @@ function hideWinner() {
     winnerModal.style.display = 'none';
 }
 
+function generateRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
 function updateWheel() {
     const newNames = nameInput.value.split('\n').filter(name => name.trim() !== '');
     if (newNames.length > 0) {
         names = newNames;
+        // Generate more colors if needed
+        while (colors.length < names.length) {
+            colors.push(generateRandomColor());
+        }
         drawWheel();
     }
 }
