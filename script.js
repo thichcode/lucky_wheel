@@ -10,6 +10,12 @@ const keepBtn = document.getElementById('keepBtn');
 const wheelTitleInput = document.getElementById('wheelTitleInput');
 const historyTableBody = document.querySelector('#historyTable tbody');
 const summaryTableBody = document.querySelector('#summaryTable tbody');
+const musicToggleBtn = document.getElementById('musicToggleBtn');
+
+// Audio elements
+const backgroundMusic = document.getElementById('backgroundMusic');
+const spinSound = document.getElementById('spinSound');
+const winSound = document.getElementById('winSound');
 
 let names = ['Prize 1', 'Prize 2', 'Prize 3', 'Prize 4', 'Prize 5', 'Prize 6'];
 let colors = ['#FFC300', '#FF5733', '#C70039', '#900C3F', '#581845', '#1B4F72'];
@@ -20,29 +26,51 @@ let winningSegment;
 let spinCount = 0;
 const results = {};
 
+// Function to start background music (requires user interaction first)
+function startBackgroundMusic() {
+    if (backgroundMusic.paused) {
+        backgroundMusic.play().catch(error => {
+            console.log("Autoplay prevented:", error);
+            // You might want to add a "Start Music" button if autoplay fails
+        });
+    }
+}
+
+// Add a click event to the body or a specific button to start music on first user interaction
+document.body.addEventListener('click', startBackgroundMusic, { once: true });
+
+// Toggle background music
+musicToggleBtn.addEventListener('click', () => {
+    if (backgroundMusic.paused) {
+        backgroundMusic.play().catch(error => console.log("Music play error:", error));
+        musicToggleBtn.textContent = '🔇 Music';
+    } else {
+        backgroundMusic.pause();
+        musicToggleBtn.textContent = '🔊 Music';
+    }
+});
+
+
 function setupCanvas() {
     const container = canvas.parentElement;
-    // Get the displayed size of the canvas from CSS
-    const displayWidth = container.clientWidth; // Or canvas.clientWidth
-    const displayHeight = container.clientHeight; // Or canvas.clientHeight
+    const displayWidth = container.clientWidth;
+    const displayHeight = container.clientHeight;
 
-    // Check if the canvas size needs to be updated
     if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
-        // Set the internal drawing buffer size to match the displayed size
         canvas.width = displayWidth;
         canvas.height = displayHeight;
-        drawWheel(); // Redraw the wheel with the new dimensions
+        drawWheel();
     }
 }
 
 function drawWheel() {
-    setupCanvas(); // Ensure canvas is set to the correct size before drawing
+    setupCanvas();
 
     const numSegments = names.length;
     const anglePerSegment = 2 * Math.PI / numSegments;
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
-    const radius = Math.min(centerX, centerY) - 10; // Subtract a small margin
+    const radius = Math.min(centerX, centerY) - 10;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
@@ -63,22 +91,26 @@ function drawWheel() {
         ctx.rotate(angle + anglePerSegment / 2);
         ctx.textAlign = 'right';
         ctx.fillStyle = '#fff';
-        // Adjust font size based on canvas size
-        const fontSize = Math.max(12, canvas.width / 25); // Minimum 12px
+        const fontSize = Math.max(12, canvas.width / 25);
         ctx.font = `${fontSize}px Arial`;
-        ctx.fillText(names[i], radius - 15, 5); // Adjust text position
+        ctx.fillText(names[i], radius - 15, 5);
         ctx.restore();
     }
-    // Draw pointer
-    ctx.restore(); // Restore to original canvas coordinate system
+    ctx.restore();
+    // Draw smaller, more refined pointer
+    ctx.save();
+    ctx.translate(centerX, 0); // Position at the top center
     ctx.beginPath();
-    ctx.moveTo(centerX, 10);
-    ctx.lineTo(centerX - 15, 40);
-    ctx.lineTo(centerX + 15, 40);
+    ctx.moveTo(0, 0);
+    ctx.lineTo(-8, 20);
+    ctx.lineTo(8, 20);
     ctx.closePath();
     ctx.fillStyle = '#333'; // Pointer color
     ctx.fill();
+    ctx.strokeStyle = '#000'; // Add a border
+    ctx.lineWidth = 1;
     ctx.stroke();
+    ctx.restore();
 }
 
 
@@ -86,9 +118,10 @@ function spin() {
     if (isSpinning) return;
     isSpinning = true;
     spinCount++;
-    // Add more randomness to the spin
-    spinSpeed = Math.random() * 0.4 + 0.2; // Increased range
-    rotation = Math.random() * 2 * Math.PI; // Start at a random angle
+    spinSound.currentTime = 0; // Reset sound to the beginning
+    spinSound.play().catch(error => console.log("Spin sound play error:", error));
+    spinSpeed = Math.random() * 0.4 + 0.2;
+    rotation = Math.random() * 2 * Math.PI;
     animateSpin();
 }
 
@@ -105,7 +138,6 @@ function animateSpin() {
         rotation = rotation % (2 * Math.PI);
         const numSegments = names.length;
         const anglePerSegment = 2 * Math.PI / numSegments;
-        // The pointer is at the top (3*PI/2), so we calculate the segment under it
         const currentAngle = ( (3 * Math.PI / 2) - rotation + 2 * Math.PI) % (2 * Math.PI);
         winningSegment = Math.floor(currentAngle / anglePerSegment);
         
@@ -113,6 +145,8 @@ function animateSpin() {
             const winner = names[winningSegment];
             showWinner(winner);
             updateResults(winner);
+            winSound.currentTime = 0; // Reset sound to the beginning
+            winSound.play().catch(error => console.log("Win sound play error:", error));
         }, 100);
     }
 }
@@ -127,14 +161,12 @@ function hideWinner() {
 }
 
 function updateResults(winner) {
-    // Update history
     const newRow = historyTableBody.insertRow();
     const spinCell = newRow.insertCell(0);
     const winnerCell = newRow.insertCell(1);
     spinCell.textContent = spinCount;
     winnerCell.textContent = winner;
 
-    // Update summary
     results[winner] = (results[winner] || 0) + 1;
     renderSummary();
 }
@@ -163,7 +195,6 @@ function updateWheel() {
     const newNames = nameInput.value.split('\n').filter(name => name.trim() !== '');
     if (newNames.length > 0) {
         names = newNames;
-        // Generate more colors if needed
         while (colors.length < names.length) {
             colors.push(generateRandomColor());
         }
@@ -176,7 +207,6 @@ updateBtn.addEventListener('click', updateWheel);
 removeBtn.addEventListener('click', () => {
     if (names.length > 1) {
         names.splice(winningSegment, 1);
-        // Also remove the corresponding color to maintain consistency
         colors.splice(winningSegment % colors.length, 1);
         drawWheel();
     }
@@ -184,10 +214,8 @@ removeBtn.addEventListener('click', () => {
 });
 keepBtn.addEventListener('click', hideWinner);
 
-// Initial setup and redraw on resize
 window.addEventListener('resize', () => {
     drawWheel();
 });
 
-// Initial draw
 drawWheel();
