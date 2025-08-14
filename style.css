@@ -5,17 +5,23 @@ body {
     align-items: flex-start;
     background-color: #f0f0f0;
     padding: 20px;
+    box-sizing: border-box; /* Ensure padding is included in body's total width */
 }
 
 .main-container {
     display: flex;
     gap: 40px;
+    width: 100%;
+    max-width: 1200px; /* Max width for very large screens */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens if needed, though media queries will handle layout */
 }
 
 .wheel-section {
     display: flex;
     flex-direction: column;
     align-items: center;
+    flex: 1; /* Allow wheel section to grow and shrink */
+    min-width: 300px; /* Ensure it doesn't get too small */
 }
 
 #wheelTitleInput {
@@ -26,34 +32,45 @@ body {
     background: transparent;
     margin-bottom: 10px;
     color: #333;
-    width: 500px;
+    width: 90%;
+    max-width: 500px;
+    box-sizing: border-box; /* Ensure padding/border are included in width */
 }
 
 .wheel-container {
     position: relative;
-    width: 500px;
-    height: 500px;
+    width: 90vw; /* Use viewport width for fluid sizing */
+    max-width: 500px; /* Max size for larger screens */
+    height: 90vw; /* Keep it square */
+    max-height: 500px;
     margin-bottom: 20px;
+    aspect-ratio: 1 / 1; /* Ensure it remains a square */
 }
 
 canvas {
     position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Ensure canvas content fits without distortion */
 }
 
 #spinBtn {
     position: absolute;
-    width: 60px;
-    height: 60px;
+    width: 12vw; /* Responsive button size */
+    height: 12vw;
+    max-width: 60px; /* Max size for larger screens */
+    max-height: 60px;
     background: #fff;
     border-radius: 50%;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    border: 5px solid #fff;
+    border: 3px solid #fff; /* Adjusted border thickness */
     box-shadow: 0 0 10px rgba(0,0,0,0.2);
     cursor: pointer;
+    z-index: 10; /* Ensure button is above canvas */
 }
 
 #spinBtn::before {
@@ -61,27 +78,33 @@ canvas {
     position: absolute;
     width: 0;
     height: 0;
-    border-left: 20px solid transparent;
-    border-right: 20px solid transparent;
-    border-bottom: 30px solid #ff5722;
-    top: -25px;
+    border-left: 5vw solid transparent; /* Responsive arrow */
+    border-right: 5vw solid transparent;
+    border-bottom: 7.5vw solid #ff5722;
+    top: -7.5vw;
     left: 50%;
     transform: translateX(-50%);
+    max-width: 20px; /* Max size for arrow */
+    max-height: 30px; /* Max size for arrow */
 }
+
 
 .input-container {
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
 }
 
 textarea {
-    width: 300px;
+    width: 90%;
+    max-width: 300px;
     height: 100px;
     margin-bottom: 10px;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    box-sizing: border-box;
 }
 
 #updateBtn {
@@ -95,7 +118,9 @@ textarea {
 }
 
 .results-section {
-    width: 300px;
+    width: 90%;
+    max-width: 300px; /* Max width for larger screens */
+    flex-shrink: 0; /* Prevent results section from shrinking too much */
 }
 
 .results-section h2 {
@@ -113,6 +138,7 @@ textarea {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
+    font-size: 0.9em; /* Slightly smaller font for tables */
 }
 
 #historyTable th, #summaryTable th {
@@ -145,6 +171,7 @@ textarea {
     max-width: 400px;
     text-align: center;
     border-radius: 10px;
+    box-sizing: border-box;
 }
 
 .modal-content h2 {
@@ -168,4 +195,131 @@ textarea {
 #keepBtn {
     background-color: #4CAF50;
     color: white;
+}
+
+/* Media Queries */
+/* Medium Screens (Tablets) */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .main-container {
+        gap: 20px;
+    }
+
+    #wheelTitleInput {
+        font-size: 1.5em;
+    }
+
+    .wheel-container {
+        width: 80vw;
+        max-width: 400px;
+        height: 80vw;
+        max-height: 400px;
+    }
+
+    #spinBtn {
+        width: 10vw;
+        height: 10vw;
+        max-width: 50px;
+        max-height: 50px;
+        border-width: 2px;
+    }
+
+    #spinBtn::before {
+        border-left-width: 4vw;
+        border-right-width: 4vw;
+        border-bottom-width: 6vw;
+        top: -6vw;
+    }
+
+    .results-section {
+        max-width: 250px;
+    }
+
+    #historyTable th, #historyTable td, #summaryTable th, #summaryTable td {
+        padding: 6px;
+        font-size: 0.8em;
+    }
+}
+
+/* Small Screens (Mobile Phones) */
+@media (max-width: 480px) {
+    body {
+        padding: 5px;
+    }
+
+    .main-container {
+        flex-direction: column; /* Stack sections vertically */
+        align-items: center;
+        gap: 15px;
+    }
+
+    .wheel-section, .results-section {
+        width: 100%;
+        max-width: none; /* Remove max-width to take full width of container */
+    }
+
+    .results-section {
+        order: 2; /* Move results section below the wheel */
+    }
+
+    .wheel-section {
+        order: 1; /* Ensure wheel section is on top */
+    }
+
+    #wheelTitleInput {
+        font-size: 1.2em;
+        max-width: none; /* Allow it to take full width of its container */
+        width: 100%;
+    }
+
+    .wheel-container {
+        width: 90vw; /* Use most of the viewport width */
+        max-width: none; /* Remove max-width */
+        height: 90vw;
+        max-height: none;
+    }
+
+    #spinBtn {
+        width: 15vw; /* Make button relatively larger on small screens */
+        height: 15vw;
+        max-width: 60px; /* But cap the max size */
+        max-height: 60px;
+        border-width: 2px;
+    }
+
+    #spinBtn::before {
+        border-left-width: 6vw;
+        border-right-width: 6vw;
+        border-bottom-width: 9vw;
+        top: -9vw;
+    }
+
+    textarea {
+        width: 95%;
+        max-width: none;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 30% auto;
+        padding: 15px;
+    }
+
+    .modal-content h2 {
+        font-size: 1.2em;
+    }
+
+    .modal-content button {
+        padding: 8px 15px;
+        font-size: 0.9em;
+        margin: 5px;
+    }
+
+    #historyTable th, #historyTable td, #summaryTable th, #summaryTable td {
+        padding: 4px;
+        font-size: 0.75em;
+    }
 }

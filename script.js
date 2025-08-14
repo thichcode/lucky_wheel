@@ -20,20 +20,40 @@ let winningSegment;
 let spinCount = 0;
 const results = {};
 
+function setupCanvas() {
+    const container = canvas.parentElement;
+    // Get the displayed size of the canvas from CSS
+    const displayWidth = container.clientWidth; // Or canvas.clientWidth
+    const displayHeight = container.clientHeight; // Or canvas.clientHeight
+
+    // Check if the canvas size needs to be updated
+    if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+        // Set the internal drawing buffer size to match the displayed size
+        canvas.width = displayWidth;
+        canvas.height = displayHeight;
+        drawWheel(); // Redraw the wheel with the new dimensions
+    }
+}
+
 function drawWheel() {
+    setupCanvas(); // Ensure canvas is set to the correct size before drawing
+
     const numSegments = names.length;
     const anglePerSegment = 2 * Math.PI / numSegments;
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = Math.min(centerX, centerY) - 10; // Subtract a small margin
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
-    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.translate(centerX, centerY);
     ctx.rotate(rotation);
 
     for (let i = 0; i < numSegments; i++) {
         const angle = i * anglePerSegment;
         ctx.beginPath();
         ctx.moveTo(0, 0);
-        ctx.arc(0, 0, canvas.width / 2, angle, angle + anglePerSegment);
+        ctx.arc(0, 0, radius, angle, angle + anglePerSegment);
         ctx.closePath();
         ctx.fillStyle = colors[i % colors.length];
         ctx.fill();
@@ -43,12 +63,24 @@ function drawWheel() {
         ctx.rotate(angle + anglePerSegment / 2);
         ctx.textAlign = 'right';
         ctx.fillStyle = '#fff';
-        ctx.font = '20px Arial';
-        ctx.fillText(names[i], canvas.width / 2 - 20, 10);
+        // Adjust font size based on canvas size
+        const fontSize = Math.max(12, canvas.width / 25); // Minimum 12px
+        ctx.font = `${fontSize}px Arial`;
+        ctx.fillText(names[i], radius - 15, 5); // Adjust text position
         ctx.restore();
     }
-    ctx.restore();
+    // Draw pointer
+    ctx.restore(); // Restore to original canvas coordinate system
+    ctx.beginPath();
+    ctx.moveTo(centerX, 10);
+    ctx.lineTo(centerX - 15, 40);
+    ctx.lineTo(centerX + 15, 40);
+    ctx.closePath();
+    ctx.fillStyle = '#333'; // Pointer color
+    ctx.fill();
+    ctx.stroke();
 }
+
 
 function spin() {
     if (isSpinning) return;
@@ -152,4 +184,10 @@ removeBtn.addEventListener('click', () => {
 });
 keepBtn.addEventListener('click', hideWinner);
 
+// Initial setup and redraw on resize
+window.addEventListener('resize', () => {
+    drawWheel();
+});
+
+// Initial draw
 drawWheel();
